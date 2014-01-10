@@ -1,0 +1,24 @@
+{ 
+	"categories": [
+		{
+			"id": "1",
+			"title": "Категория 1",
+			"image": "img/cat-117679768.jpg"
+		},
+		{
+			"id": "2",
+			"title": "Категория 2",
+			"image": "img/cat-120856582.jpg"
+		},
+		{
+			"id": "3",
+			"title": "Категория 3",
+			"image": "img/cat-122581939.jpg"
+		},
+		{
+			"id": "4",
+			"title": "Категория 4",
+			"image": "img/cat-124847119.jpg"
+		}					  	
+	]
+}

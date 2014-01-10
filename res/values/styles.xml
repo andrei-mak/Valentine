@@ -1,0 +1,40 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBaseTheme" parent="@style/Theme.AppCompat.Light">
+
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+        
+        <item name="android:actionBarStyle" tools:targetApi="11">@style/ActionBar</item>
+        <item name="android:actionBarTabStyle" tools:targetApi="11">@style/ActionBarTabStyle</item>
+        
+
+        <!-- Support library compatibility -->
+        <item name="actionBarStyle">@style/ActionBar</item>
+        <item name="actionBarTabStyle">@style/ActionBarTabStyle</item>
+    </style>
+    
+    <style name="ActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="background">@drawable/ab_bq</item>
+        <item name="backgroundStacked">@drawable/ab_stacked_solid_tost</item>
+    </style>
+
+    <style name="ActionBarTabStyle" parent="Widget.AppCompat.ActionBar.TabView">
+        <item name="android:background">@drawable/tab_indicator_ab_tost</item>
+    </style>
+    
+ 
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+</resources>
