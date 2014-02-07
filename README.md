@@ -28,3 +28,7 @@ https://developers.google.com/analytics/devguides/collection/android/v2/exceptio
 http://www.vogella.com/code/ApiDemos/src/com/example/android/apis/content/ExternalStorage.html
 
 boolean hasExternalStoragePublicPicture() { ...  }
+
+App timing
+
+https://developers.google.com/analytics/devguides/collection/android/v2/usertimings
