@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Tracker;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -45,12 +46,18 @@ public class CreateActivity extends ActionBarActivity implements
 	
 	// Different background size for text longer then parameter
 	public static final int MAX_TEXT_LENGTH = 100; 
+	private static final int TEXT_SIZE = 26; 
+	private static final int JPEG_COMPRESSION = 80; 
+	private static final String EXPORT_FILE_NAME = "MyValentine.jpg";
 	
 	Bitmap combined = null;
 	EditText mEditText;
 	ImageView mImageView;
 	Drawable currentSelectedImageBg;
 	Drawable currentImageBg;
+	
+	// Google Analytics
+	private Tracker myTracker; 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -164,6 +171,9 @@ public class CreateActivity extends ActionBarActivity implements
 		super.onStart();
 		// The rest of your onStart() code.
 		EasyTracker.getInstance().activityStart(this); // Add this method.
+		// Get a reference to tracker.
+		myTracker = EasyTracker.getTracker(); 
+		myTracker.sendView("Create Screen");
 	}
 
 	@Override
@@ -240,11 +250,11 @@ public class CreateActivity extends ActionBarActivity implements
 	}
 
 	/**
-	 * For Drawable type input (resId)
+	 * Draw text to image (version for Drawable input type - resId)
 	 * 
 	 * @param context
-	 * @param resId
-	 * @param text
+	 * @param resId - image for draw text on
+	 * @param text - text for drawing
 	 * @return
 	 */
 	private Bitmap drawTextToBitmap(Context context, Drawable resId, String text) {
@@ -308,7 +318,7 @@ public class CreateActivity extends ActionBarActivity implements
 			// Set text properties: color, .. , etc
 			TextPaint mTextPaint = new TextPaint();
 			mTextPaint.setColor(textColor);
-			mTextPaint.setTextSize(26 * scale);
+			mTextPaint.setTextSize(TEXT_SIZE * scale);
 			
 			Typeface typeFace = Typeface.createFromAsset(context.getAssets(),
 					"fonts/MarckScript-Regular.ttf");		
@@ -346,9 +356,9 @@ public class CreateActivity extends ActionBarActivity implements
 
 			return bitmap;
 		} catch (Exception e) {
-			// TODO: handle exception
+			Toast.makeText(getApplicationContext(), getString(R.string.error_fail_draw_text),
+					Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
-
 			return null;
 		}
 
@@ -396,10 +406,16 @@ public class CreateActivity extends ActionBarActivity implements
 			File path = Environment
 					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 			if (path != null) {
-				file = new File(path, "MyValentine.jpg");
+				file = new File(path, EXPORT_FILE_NAME);
+				if (myTracker != null) {
+					myTracker.sendEvent("external_starage", "share_btn", "path", (long) 1);
+				}
 			} else {
 				path = getExternalFilesDir(null);
-				file = new File(path, "MyValentine.jpg");
+				file = new File(path, EXPORT_FILE_NAME);
+				if (myTracker != null) {
+					myTracker.sendEvent("external_starage", "share_btn", "path", (long) 2);
+				}
 			}
 
 			try {
@@ -413,7 +429,7 @@ public class CreateActivity extends ActionBarActivity implements
 				// not currently mounted this will silently fail.
 				FileOutputStream outputStream;
 				outputStream = new FileOutputStream(file);
-				bmp.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
+				bmp.compress(Bitmap.CompressFormat.JPEG, JPEG_COMPRESSION, outputStream);
 				outputStream.close();
 
 				// Tell the media scanner about the new file so that it is
@@ -428,18 +444,35 @@ public class CreateActivity extends ActionBarActivity implements
 							}
 						});
 
+			} catch (NullPointerException e) {
+				// false indicates non-fatal exception.
+				if (myTracker != null) {
+					myTracker.sendException(e.getMessage(), true);
+				}
+				Toast.makeText(getApplicationContext(),getString(R.string.error_fail_write_file),
+						Toast.LENGTH_SHORT).show();
+
 			} catch (FileNotFoundException e) {
-				Toast.makeText(getApplicationContext(), "File not found",
+				if (myTracker != null) {
+					myTracker.sendException(e.getMessage(), true);
+				}
+				Toast.makeText(getApplicationContext(), getString(R.string.error_fail_write_file),
 						Toast.LENGTH_SHORT).show();
 			} catch (IOException e) {
+				if (myTracker != null) {
+					myTracker.sendException(e.getMessage(), true);
+				}
 				// Unable to create file, likely because external storage is
 				// not currently mounted.
-				Toast.makeText(getApplicationContext(), "Error writing file",
+				Toast.makeText(getApplicationContext(), getString(R.string.error_fail_write_file),
 						Toast.LENGTH_SHORT).show();
 				// Log.w("ExternalStorage", "Error writing file", e);
 			}
 		} else {
-			Toast.makeText(getApplicationContext(), "SDcard unavailable",
+			if (myTracker != null) {
+				myTracker.sendEvent("external_starage", "share_btn", "sdcard unavailable", (long) 1);
+			}
+			Toast.makeText(getApplicationContext(), getString(R.string.error_sd_card_unavailable),
 					Toast.LENGTH_SHORT).show();
 		}
 		return file;
