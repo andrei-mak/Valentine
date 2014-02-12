@@ -15,6 +15,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -259,10 +260,11 @@ public class CreateActivity extends ActionBarActivity implements
 	 */
 	private Bitmap drawTextToBitmap(Context context, Drawable resId, String text) {
 		try {
-			Resources resources = context.getResources();
+			Resources res = context.getResources();
 			// TODO review scale
-			float scale = resources.getDisplayMetrics().density;
+			float scale = res.getDisplayMetrics().density;
 			Bitmap bitmap = drawableToBitmap(resId);
+			//Bitmap bitmap = decodeSampledBitmapFromResource(res, resId, 200, 200);
 			android.graphics.Bitmap.Config bitmapConfig = bitmap.getConfig();
 			// set default bitmap config if none
 			if (bitmapConfig == null) {
@@ -393,6 +395,45 @@ public class CreateActivity extends ActionBarActivity implements
         canvas.drawBitmap(bmp2, 0,(bmp1.getHeight() - bmp2.getHeight())/2, null);
         return bmOverlay;
     }
+	
+	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+	        int reqWidth, int reqHeight) {
+
+	    // First decode with inJustDecodeBounds=true to check dimensions
+	    final BitmapFactory.Options options = new BitmapFactory.Options();
+	    options.inJustDecodeBounds = true;
+	    BitmapFactory.decodeResource(res, resId, options);
+
+	    // Calculate inSampleSize
+	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+	    // Decode bitmap with inSampleSize set
+	    options.inJustDecodeBounds = false;
+	    return BitmapFactory.decodeResource(res, resId, options);
+	}
+	
+	public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+	    // Raw height and width of image
+	    final int height = options.outHeight;
+	    final int width = options.outWidth;
+	    int inSampleSize = 1;
+	
+	    if (height > reqHeight || width > reqWidth) {
+	
+	        final int halfHeight = height / 2;
+	        final int halfWidth = width / 2;
+	
+	        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+	        // height and width larger than the requested height and width.
+	        while ((halfHeight / inSampleSize) > reqHeight
+	                && (halfWidth / inSampleSize) > reqWidth) {
+	            inSampleSize *= 2;
+	        }
+	    }
+	
+	    return inSampleSize;
+	}
 	
 	private File createExternalStoragePublicPicture(Bitmap bmp) {
 		File file = null;
